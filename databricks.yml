@@ -1,0 +1,77 @@
+bundle:
+  name: weather-analytics
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405613702166058.18.azuredatabricks.net
+
+resources:
+  jobs:
+    weather_medallion_pipeline:
+      name: weather_medallion_pipeline
+      tasks:
+        - task_key: staging
+          spark_python_task:
+            python_file: src/transform_staging.py
+          job_cluster_key: pipeline_cluster
+
+        - task_key: bronze
+          depends_on:
+            - task_key: staging
+          spark_python_task:
+            python_file: src/transform_bronze.py
+          job_cluster_key: pipeline_cluster
+
+        - task_key: silver
+          depends_on:
+            - task_key: bronze
+          spark_python_task:
+            python_file: src/transform_silver.py
+          job_cluster_key: pipeline_cluster
+
+        - task_key: gold
+          depends_on:
+            - task_key: silver
+          spark_python_task:
+            python_file: src/transform_gold.py
+          job_cluster_key: pipeline_cluster
+
+        - task_key: bi
+          depends_on:
+            - task_key: gold
+          spark_python_task:
+            python_file: src/transform_bi.py
+          job_cluster_key: pipeline_cluster
+
+        - task_key: rpt
+          depends_on:
+            - task_key: gold
+          spark_python_task:
+            python_file: src/transform_rpt.py
+          job_cluster_key: pipeline_cluster
+
+  job_clusters:
+    - job_cluster_key: pipeline_cluster
+      new_cluster:
+        spark_version: 15.4.x-scala2.12
+        node_type_id: Standard_D4s_v3
+        num_workers: 0
+        spark_conf:
+          spark.master: local[*, 4]
+        autotermination_minutes: 30
+
+```
+
+Note `bi` and `rpt` both depend on `gold` but not on each other — they can run in parallel, which is exactly the right pattern.
+
+---
+
+**Create `.gitignore`:**
+```
+__pycache__/
+*.pyc
+.databricks/
+.env
