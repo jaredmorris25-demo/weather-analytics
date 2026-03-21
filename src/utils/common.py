@@ -26,6 +26,14 @@ def configure_storage(spark, dbutils):
         f"fs.azure.account.key.{STORAGE_ACCOUNT}.dfs.core.windows.net",
         account_key
     )
+    spark.conf.set(
+        "fs.azure.account.auth.type",
+        "SharedKey"
+    )
+    spark.conf.set(
+        f"fs.azure.account.auth.type.{STORAGE_ACCOUNT}.dfs.core.windows.net",
+        "SharedKey"
+    )
 
 
 def make_surrogate_key(city, timestamp):
