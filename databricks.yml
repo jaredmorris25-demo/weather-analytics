@@ -20,6 +20,7 @@ resources:
             node_type_id: Standard_D4s_v3
             num_workers: 0
             spark_conf:
+              spark.databricks.unityCatalog.enabled: "false"    # Required for direct ABFSS access with account keys
               spark.databricks.cluster.profile: singleNode
               spark.master: "local[*]"
             custom_tags:
