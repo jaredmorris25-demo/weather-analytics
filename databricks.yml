@@ -3,7 +3,6 @@ bundle:
 
 targets:
   dev:
-    mode: development
     default: true
     workspace:
       host: https://adb-7405613702166058.18.azuredatabricks.net
