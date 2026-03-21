@@ -19,7 +19,11 @@ resources:
             node_type_id: Standard_D4s_v3
             num_workers: 0
             spark_conf:
-              spark.master: "local[*, 4]"
+              spark.databricks.cluster.profile: singleNode
+              spark.master: "local[*]"
+              spark.databricks.unityCatalog.enabled: "false"
+            custom_tags:
+              ResourceClass: SingleNode
             autotermination_minutes: 30
       tasks:
         - task_key: staging
