@@ -12,6 +12,8 @@ resources:
   jobs:
     weather_medallion_pipeline:
       name: weather_medallion_pipeline
+      run_as:
+        user_name: dbadmin@jaredmorris25gmail.onmicrosoft.com
       job_clusters:
         - job_cluster_key: pipeline_cluster
           new_cluster:
