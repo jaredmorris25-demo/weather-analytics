@@ -44,18 +44,12 @@ def run(spark, dbutils):
         .withColumn("surrogate_key", gold_key_udf(F.col("city"), F.col("reporting_day"))) \
         .withColumn("aggregated_at", F.current_timestamp()) \
         .select(
-            "surrogate_key", "city", "country", "reporting_day",    # ── CHANGED: was "date"
+            "surrogate_key", "city", "country", "reporting_day",
             "avg_temperature", "max_temperature", "min_temperature",
             "avg_feels_like", "avg_humidity", "avg_wind_speed", "avg_pressure",
             "total_readings", "valid_readings", "aggregated_at"
         )
     
-    # ── CHANGED: full overwrite for one-time historical restate ──────────────
-    # Swap back to MERGE once rebuild is confirmed correct.
-    df_gold.write.format("delta").mode("overwrite").save(PATHS["gold"])
-    print(f"Gold full rewrite complete: {df_gold.count()} rows")
-
-    '''
     if DeltaTable.isDeltaTable(spark, PATHS["gold"]):
         DeltaTable.forPath(spark, PATHS["gold"]).alias("target").merge(
             df_gold.alias("source"),
@@ -65,7 +59,7 @@ def run(spark, dbutils):
     else:
         df_gold.write.format("delta").mode("overwrite").save(PATHS["gold"])
         print(f"Gold initial write: {df_gold.count()} rows")
-        '''
+        
 
 if __name__ == "__main__":
     spark = SparkSession.builder.getOrCreate()
